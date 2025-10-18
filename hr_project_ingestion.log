@@ -1,0 +1,5 @@
+2025-10-16 22:11:27,618 - INFO - Database engine created. It will be saved at: hr_analytics.db
+2025-10-16 22:11:27,619 - INFO - --- Starting ETL Process ---
+2025-10-16 22:11:27,619 - INFO - Processing file: data/WA_Fn-UseC_-HR-Employee-Attrition.csv -> into table: hr_data
+2025-10-16 22:11:27,763 - INFO - Successfully loaded table: hr_data
+2025-10-16 22:11:27,764 - INFO - --- ETL Process Complete. Total time taken: 0.15 seconds. ---

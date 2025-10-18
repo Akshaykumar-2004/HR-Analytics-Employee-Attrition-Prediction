@@ -1,0 +1,733 @@
+Of course! I can create a complete, step-by-step guide for a new, job-winning project: The HR Attrition Prediction Analysis.
+
+This guide will be structured just like the Vendor Analysis project, explaining every concept and line of code as if you're an 8th-grade detective learning for the first time. We will build everything from the ground up, including data setup, cleaning, analysis, statistical modeling, and a final dashboarding plan.
+
+Masterclass: The HR Attrition & Prediction Project (Ultimate Edition)
+Part A: The Mission Briefing 📜
+Before we can solve a problem, we must understand the case. Imagine we are data detectives hired by the CEO of a large company, "Innovate Inc."
+
+The Problem We've Been Hired to Solve
+
+The CEO of Innovate Inc. is worried. Talented employees are leaving the company, but nobody is sure why. Losing an employee is expensive—it costs time and money to hire and train a replacement. The CEO needs to stop this "leaky bucket" before it hurts the company's success.
+
+She has many questions:
+
+Which departments are losing the most people?
+
+Are we paying people enough? Does a bigger raise make them stay?
+
+Are our employees happy and not overworked?
+
+Are we losing our most experienced people or our newest hires?
+
+Most importantly, can we predict who might leave next so we can try to help them stay?
+
+Our job, as data detectives, is to use the company's HR data to find the answers.
+
+Our Five Critical Mission Goals
+
+The CEO has given us a specific list of five mysteries to solve. Our entire project will be dedicated to answering these questions with data.
+
+The Leaky Departments: Find out the overall attrition rate and identify which departments have the highest number of employees leaving.
+
+The Money Question: Investigate the link between an employee's income, their last salary hike, and their decision to leave the company.
+
+The Burnout Factor: Determine if low job satisfaction or poor work-life balance is a major reason for employees quitting.
+
+The Loyalty Puzzle: Uncover if the company is losing its long-term, loyal employees or its newer hires.
+
+The Crystal Ball (Prediction): Build a "crystal ball"—a machine learning model—that can predict the likelihood of an employee leaving, based on their data.
+
+Part B: Building the Project, Step-by-Detailed-Step
+Section 1: Setting Up Your Digital Workshop 💻
+Every detective needs a workspace. Ours will be a Jupyter Notebook.
+
+Step 1: Get Your Evidence (The Dataset)
+
+Our "case file" is the famous IBM HR Analytics Employee Attrition & Performance dataset.
+
+Action Required: Download the dataset from this link on Kaggle: IBM HR Analytics Dataset on Kaggle
+
+You will need to create a free Kaggle account if you don't have one. After downloading, you will have a file named WA_Fn-UseC_-HR-Employee-Attrition.csv.
+
+Step 2: Installing Your Toolkit
+
+We need Python and Jupyter. The easiest way is to install Anaconda. It's a free package with everything we need.
+
+Go to the Anaconda website: https://www.anaconda.com/download
+
+Download the installer for your operating system.
+
+Run the installer and accept all the default options.
+
+Step 3: Creating Your Project Headquarters
+
+Open File Explorer and navigate to your D: drive.
+
+Create a New Folder and name it exactly: HR_Attrition_Project
+
+Go inside this folder and create another New Folder. Name this one exactly: data
+
+Action Required: Find the WA_Fn-UseC_-HR-Employee-Attrition.csv file you downloaded and move it into this data folder.
+
+Your headquarters is ready! The path should look like: D:\HR_Attrition_Project\data\
+
+Step 4: Launching & Creating Your Investigation Notebooks
+
+We'll use the Command Prompt to launch Jupyter.
+
+Click the Windows Start button, type cmd, and open the Command Prompt.
+
+Switch to the D: drive by typing D: and pressing Enter.
+
+Navigate to your project folder by typing cd HR_Attrition_Project and pressing Enter.
+
+Launch Jupyter by typing jupyter notebook and pressing Enter. A new tab will open in your browser.
+
+In Jupyter, click "New" -> "Python 3 (ipykernel)".
+
+Rename this new notebook to: 1_ETL_and_Database_Creation
+
+Go back to the first browser tab, click "New" -> "Python 3" again.
+
+Rename this second notebook to: 2_Analysis_and_Prediction
+
+Your workshop is now perfectly set up!
+
+Section 2: The Automated Librarian (The ETL Process) 🤖📚
+Our clue (the CSV file) needs to be organized into a central library (a database). We'll build an automated ETL (Extract, Transform, Load) script to do this.
+
+Concept Deep Dive: What is ETL?
+
+Extract: Reading the data from the source CSV file.
+
+Transform: Cleaning or changing the data. Our data is already quite clean, so we won't do much here.
+
+Load: Saving the data into a single, efficient database file.
+
+Our Python script is a reusable recipe that does this perfectly every time.
+
+The Ingestion Script: Your Automation Recipe
+
+This is the complete script for your 1_ETL_and_Database_Creation.ipynb notebook.
+
+Action: Copy this entire code block into the first cell of your notebook and run it.
+
+
+# === Step 1: Import Your Toolkits ===
+# What are we doing? Gathering the tools we need.
+# pandas: For working with data tables (DataFrames).
+# sqlalchemy: Lets Python speak the language of databases.
+# logging: Our script's personal diary to record what it does.
+# time: A stopwatch to see how long our process takes.
+import pandas as pd
+from sqlalchemy import create_engine
+import logging
+import time
+
+# === Step 2: Set Up the Script's Diary (Logging) ===
+# What are we doing? Telling our script to create a log file in our project folder.
+# Why? So we can check that everything worked correctly. It's a professional habit.
+log_path = "hr_project_ingestion.log"
+logging.basicConfig(
+    filename=log_path,
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    filemode='w'  # 'w' starts a fresh diary every time we run the script.
+)
+
+# === Step 3: Create the "Key" to Our Database ===
+# What are we doing? Defining where our database will live and its name.
+# Why? All our organized data will be in one file, making it easy to access.
+db_path = "hr_analytics.db"
+engine = create_engine('sqlite:///' + db_path)
+logging.info("Database engine created. It will be saved at: " + db_path)
+
+# === Step 4: The Master Function to Run the Whole Process ===
+# What are we doing? Putting all instructions into one big function called 'load_data_to_db'.
+# Why? Organizing code into functions makes it clean and reusable.
+def load_data_to_db():
+    """Reads the HR CSV file and loads it into our SQLite database."""
+    start_time = time.time()  # Start the stopwatch.
+    logging.info("--- Starting ETL Process ---")
+
+    try:  # 'try' means: "Attempt this, but be ready for errors."
+        # Define the full path to our evidence file.
+        csv_file_path = 'data/WA_Fn-UseC_-HR-Employee-Attrition.csv'
+        
+        # Define a clean, simple name for our table in the database.
+        table_name = 'hr_data'
+        logging.info("Processing file: " + csv_file_path + " -> into table: " + table_name)
+
+        # Use pandas to read the entire CSV file into memory.
+        df = pd.read_csv(csv_file_path)
+
+        # This is the magic 'Load' step.
+        # df.to_sql() saves our pandas DataFrame as a table inside our database file.
+        # name=table_name: The name of the table in the database.
+        # con=engine: The database connection we want to use.
+        # if_exists='replace': If the table already exists, delete it and create a new one.
+        # index=False: We don't need to save the pandas index number as a column.
+        df.to_sql(name=table_name, con=engine, if_exists='replace', index=False)
+        logging.info("Successfully loaded table: " + table_name)
+
+    except Exception as e:  # If any error happens...
+        # ...we 'catch' it and record it in our diary instead of crashing.
+        logging.error("Failed to process file. Error: " + str(e))
+
+    end_time = time.time()  # Stop the stopwatch.
+    total_time_seconds = end_time - start_time
+    logging.info("--- ETL Process Complete. Total time taken: " + str(round(total_time_seconds, 2)) + " seconds. ---")
+
+# === Step 5: The "Start Button" for our Script ===
+# What is this? A standard Python safety check.
+# It means: "Only run the 'load_data_to_db' recipe if this script is being run directly."
+if __name__ == '__main__':
+    load_data_to_db()
+    print("ETL Process has finished. Check the log file 'hr_project_ingestion.log' for details.")
+
+
+What Just Happened?
+
+You've executed a professional ETL script! Go look in your D:\HR_Attrition_Project folder. You will see two new files:
+
+hr_analytics.db: Your new, organized library containing all the HR data.
+
+hr_project_ingestion.log: The script's diary, confirming the successful operation.
+
+Section 3: The Detective Work (EDA & Feature Engineering) 🔎
+Now, open your second notebook, 2_Analysis_and_Prediction.ipynb. We'll connect to our database, clean our clues, and create new, more powerful ones.
+
+Block 1: Connecting and Loading the Data
+
+Action: Copy this code into the first cell of your notebook and run it.
+
+
+# === Step 1: Import Our Toolkits ===
+# pandas: For working with our data tables.
+# numpy: A powerful tool for numerical operations.
+# sqlite3: The specific tool for connecting to SQLite databases.
+# matplotlib & seaborn: Our toolkits for creating beautiful charts.
+import pandas as pd
+import numpy as np
+import sqlite3
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Make our charts look nice and professional.
+sns.set_style("whitegrid")
+
+# === Step 2: Connect to Our Database and Load Data ===
+# We create a connection to the database file we made earlier.
+db_path = 'hr_analytics.db'
+con = sqlite3.connect(db_path)
+
+# The table inside our database is named 'hr_data'. Let's load it.
+# pd.read_sql_query() runs an SQL query and loads the result into a pandas DataFrame.
+# "SELECT * FROM hr_data" means "Get all columns (*) from the table named hr_data".
+query = "SELECT * FROM hr_data"
+df = pd.read_sql_query(query, con)
+
+# It's good practice to close the connection when we're done querying.
+con.close()
+
+# === Step 3: Initial Investigation ===
+# Let's get a feel for our data.
+print("--- First 5 Rows of the Data ---")
+print(df.head())
+
+print("\n--- Basic Information About the Data ---")
+# .info() gives us a summary: column names, number of non-empty values, and data types.
+df.info()
+
+
+Block 2: Data Cleaning and Feature Engineering (Creating New Clues)
+
+Real detectives combine clues to find new insights. We'll do the same by creating new columns.
+
+Action: Copy this code into the next cell and run it.
+
+# --- Clue #1: Make Attrition easier to use ---
+# The 'Attrition' column has "Yes" and "No". Computers prefer numbers.
+# We'll create a new column 'Attrition_numeric' where Yes=1 and No=0.
+# This makes it easy to calculate the attrition rate (just find the average of this column!).
+df['Attrition_numeric'] = df['Attrition'].apply(lambda x: 1 if x == 'Yes' else 0)
+
+# --- Clue #2: Create Age Groups ---
+# Looking at individual ages is too detailed. Let's create age groups.
+# 'bins' defines the edges of our groups (18-25, 26-35, etc.).
+# 'labels' gives a name to each group.
+bins = [17, 25, 35, 45, 55, 65]
+labels = ['18-25', '26-35', '36-45', '46-55', '56-65']
+df['AgeGroup'] = pd.cut(df['Age'], bins=bins, labels=labels, right=True)
+
+# --- Clue #3: Simplify Job Satisfaction ---
+# The 'JobSatisfaction' is rated 1-4. Let's make it simpler to read.
+# We'll map the numbers to text labels.
+satisfaction_map = {1: 'Low', 2: 'Medium', 3: 'High', 4: 'Very High'}
+df['JobSatisfaction_label'] = df['JobSatisfaction'].map(satisfaction_map)
+
+# --- Final Check: Look for missing clues (NaN values) ---
+# Our dataset is very clean, but it's a crucial step in any project.
+print("\n--- Missing Values Check ---")
+print(df.isnull().sum())
+
+# We have a clean and enhanced dataset, ready for analysis!
+print("\nNew feature columns created successfully!")
+
+Concept Deep Dive: Outlier Detection
+
+An outlier is a data point that is very different from the others, like finding a professional basketball player's height in a list of 8th graders' heights. It can sometimes mess up our analysis.
+
+A common way to find outliers is the IQR (Interquartile Range) method.
+
+Imagine lining up all your data points from smallest to largest.
+
+Q1 (25th percentile): The point that is 25% of the way through the list.
+
+Q3 (75th percentile): The point that is 75% of the way through the list.
+
+IQR = Q3 - Q1. It's the range where the middle 50% of your data lives.
+
+Any point below Q1 - 1.5 * IQR or above Q3 + 1.5 * IQR is often considered an outlier.
+
+In our project, columns like MonthlyIncome might have outliers (e.g., the CEO's salary). For our mission goals, we don't need to remove them, but it's a critical skill to know about!
+
+Section 4: Solving the Mysteries (Answering the Business Questions) 🕵️‍♂️
+Now we use our clean data (df) to solve the CEO's mysteries with charts.
+
+Block 3: Solving Mystery #1 (Leaky Departments) & #2 (The Money Question)
+
+Action: Copy this code into the next cell and run it.
+
+# --- Mission Goal #1: Find the Leaky Departments ---
+# What are we doing? Calculating the overall attrition rate and then seeing which department has the most people leaving.
+overall_attrition_rate = df['Attrition_numeric'].mean() * 100
+
+plt.figure(figsize=(12, 7))
+# A countplot is perfect for counting how many people fall into each category.
+# We set 'hue' to 'Attrition' to get separate bars for 'Yes' and 'No' for each department.
+sns.countplot(data=df, y='Department', hue='Attrition')
+plt.title('Mission Goal #1: Attrition by Department')
+plt.xlabel('Number of Employees')
+plt.ylabel('Department')
+plt.show()
+
+print(f"--- Mission #1 Verdict: The overall attrition rate is {overall_attrition_rate:.2f}%. ---")
+print("The chart above shows the raw count of employees who stayed vs. left in each department. R&D has the most leavers by count.")
+
+# --- Mission Goal #2: The Money Question ---
+# What are we doing? Using box plots to compare the monthly income and salary hike for employees who stayed vs. left.
+# A box plot shows the distribution of data (min, max, median, Q1, Q3).
+fig, axes = plt.subplots(1, 2, figsize=(16, 6)) # Create a figure with two side-by-side plots.
+
+# Plot 1: Monthly Income
+sns.boxplot(data=df, x='Attrition', y='MonthlyIncome', ax=axes[0])
+axes[0].set_title('Income vs. Attrition')
+axes[0].set_xlabel('Attrition')
+axes[0].set_ylabel('Monthly Income ($)')
+
+# Plot 2: Percent Salary Hike
+sns.boxplot(data=df, x='Attrition', y='PercentSalaryHike', ax=axes[1])
+axes[1].set_title('Salary Hike vs. Attrition')
+axes[1].set_xlabel('Attrition')
+axes[1].set_ylabel('Percent Salary Hike (%)')
+
+plt.tight_layout() # Adjusts plots to prevent them from overlapping.
+plt.show()
+
+print("\n--- Mission #2 Verdict: The box plots show a clear story. ---")
+print("Employees who left ('Yes') tend to have a lower median monthly income than those who stayed.")
+print("Interestingly, the salary hike percentage does not seem to show a significant difference between the two groups.")
+
+Block 4: Solving Mystery #3 (The Burnout Factor) & #4 (The Loyalty Puzzle)
+
+Action: Copy this code into the next cell and run it.
+
+# --- Mission Goal #3: The Burnout Factor ---
+# What are we doing? Comparing job satisfaction and work-life balance for those who left vs. stayed.
+fig, axes = plt.subplots(1, 2, figsize=(16, 6))
+
+# Plot 1: Job Satisfaction
+sns.countplot(data=df, x='JobSatisfaction_label', hue='Attrition', ax=axes[0], order=['Low', 'Medium', 'High', 'Very High'])
+axes[0].set_title('Job Satisfaction vs. Attrition')
+axes[0].set_xlabel('Job Satisfaction')
+
+# Plot 2: Work-Life Balance
+# We'll map the numbers to labels directly for this plot.
+work_life_map = {1: 'Bad', 2: 'Good', 3: 'Better', 4: 'Best'}
+df['WorkLifeBalance_label'] = df['WorkLifeBalance'].map(work_life_map)
+sns.countplot(data=df, x='WorkLifeBalance_label', hue='Attrition', ax=axes[1], order=['Bad', 'Good', 'Better', 'Best'])
+axes[1].set_title('Work-Life Balance vs. Attrition')
+axes[1].set_xlabel('Work-Life Balance')
+
+plt.tight_layout()
+plt.show()
+
+print("\n--- Mission #3 Verdict: Happiness matters. ---")
+print("Employees with 'Low' job satisfaction have a proportionally higher rate of attrition. A similar trend is visible for those with 'Bad' work-life balance.")
+
+
+# --- Mission Goal #4: The Loyalty Puzzle ---
+# What are we doing? Looking at the years spent at the company for employees who left.
+# A histogram shows the distribution of a single numerical variable.
+plt.figure(figsize=(12, 7))
+# We first filter our data to only include people who left (Attrition == 'Yes').
+sns.histplot(data=df[df['Attrition'] == 'Yes'], x='YearsAtCompany', kde=True, bins=20)
+plt.title('Mission Goal #4: Tenure of Employees Who Left')
+plt.xlabel('Years at Company')
+plt.ylabel('Number of Employees Who Left')
+plt.show()
+
+print("\n--- Mission #4 Verdict: We are losing new hires. ---")
+print("The histogram shows a large spike at the very beginning (0-2 years). This means a significant number of employees are leaving very early in their careers with the company.")
+
+
+Section 5: The Expert Witness (The Crystal Ball) 🔮
+We need to build our predictive model to solve the final mystery.
+
+Concept Deep Dive: Machine Learning & Logistic Regression
+
+Machine Learning is like teaching a computer to find patterns, just like you learn that a round, red fruit is likely an apple. You show it lots of examples of employees who stayed and left, along with their data (income, age, satisfaction, etc.). The computer "learns" the patterns associated with leaving.
+
+Logistic Regression is our chosen model. It's perfect for "Yes/No" questions. It doesn't just guess "Yes" or "No"; it calculates the probability (a number between 0 and 1) that an employee will leave. We can then set a threshold (e.g., if the probability is > 50%, we predict "Yes").
+
+Block 5: Building and Testing Our Prediction Model
+
+Action: Copy this final analysis code into the next cell and run it.
+
+
+# === Step 1: Import Our Modeling Toolkits ===
+# We need some expert witnesses from the scikit-learn library.
+from sklearn.model_selection import train_test_split # To split our data into training and testing sets.
+from sklearn.linear_model import LogisticRegression # Our chosen prediction model.
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report # Tools to judge our model's performance.
+from sklearn.preprocessing import StandardScaler # A tool to scale our numerical data to a standard range.
+
+# === Step 2: Prepare the Data for the Model ===
+# Our model only understands numbers. We need to convert text columns into numerical ones.
+
+# We'll create a new DataFrame for our model.
+model_df = df.copy()
+
+# Convert all categorical text columns into numbers using 'get_dummies'.
+# This creates new columns for each category (e.g., Department_Sales, Department_R&D) with 1s and 0s.
+model_df = pd.get_dummies(model_df, columns=['BusinessTravel', 'Department', 'EducationField', 'Gender', 'JobRole', 'MaritalStatus', 'OverTime'], drop_first=True)
+
+# We can drop columns that are not useful for prediction or that we've already replaced.
+# <--- THE FIX IS HERE! We've added 'Over18' to this list.
+model_df = model_df.drop(['Attrition', 'EmployeeCount', 'StandardHours', 'EmployeeNumber', 'Over18', 'AgeGroup', 'JobSatisfaction_label', 'WorkLifeBalance_label'], axis=1)
+
+# === Step 3: Define the Mission (Features and Target) ===
+# X contains all the clues (features) we will use for prediction.
+X = model_df.drop('Attrition_numeric', axis=1)
+# y is the target we want to predict (did they leave or not?).
+y = model_df['Attrition_numeric']
+
+# === Step 4: Split the Data for a Fair Test ===
+# We can't test our model on the same data it learned from. That's cheating!
+# We split our data: 80% for training the model, 20% for testing it.
+# random_state=42 ensures we get the same split every time we run the code.
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+
+# === Step 5: Scale the Numerical Features ===
+# Scaling numbers to be in a similar range (e.g., -1 to 1) helps the model learn better.
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+# === Step 6: Train the Model ===
+# We create an instance of our Logistic Regression model and 'fit' it to our training data.
+# This is the "learning" step.
+model = LogisticRegression(random_state=42)
+model.fit(X_train, y_train)
+
+# === Step 7: Make Predictions on the Test Data ===
+# Now we use our trained model to predict attrition for the unseen test data.
+y_pred = model.predict(X_test)
+
+# === Step 8: The Verdict - How Good is Our Model? ===
+accuracy = accuracy_score(y_test, y_pred)
+conf_matrix = confusion_matrix(y_test, y_pred)
+class_report = classification_report(y_test, y_pred)
+
+print("--- Mission #5 Verdict: The Crystal Ball is Ready ---")
+print(f"Model Accuracy: {accuracy * 100:.2f}%")
+print("\n--- The Confusion Matrix ---")
+# A confusion matrix tells us where the model got it right and wrong.
+# Top-left: Correctly predicted 'Stay'
+# Bottom-right: Correctly predicted 'Leave'
+# Top-right/Bottom-left: Errors
+sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', xticklabels=['Stayed', 'Left'], yticklabels=['Stayed', 'Left'])
+plt.xlabel('Predicted')
+plt.ylabel('Actual')
+plt.title('Confusion Matrix')
+plt.show()
+
+print("\n--- Detailed Classification Report ---")
+print(class_report)
+print("Recommendation: This model can now be used to identify current employees who have a high risk of leaving. The HR team can then proactively engage with these employees.")
+
+
+Of course! That's an excellent final step. It's like we've built our crystal ball, and now we're giving it a new case file to see what it predicts. This is exactly how a company would use this model in the real world.
+
+We will create a profile for a hypothetical employee, prepare their data in the exact same way we prepared our training data, and then ask our trained model for a prediction.
+
+Section 7: The Final Test (Predicting with New Data) 🔮
+Let's create two new "employee files" to test our model:
+
+Employee A: A profile of an employee who seems happy and is likely to stay.
+
+Employee B: A profile of an employee who shows several red flags and might be at risk of leaving.
+
+Action: Add this new code block to the end of your 2_Analysis_and_Prediction.ipynb notebook and run it.
+
+
+# === Step 1: Create the "Case Files" for Our New Employees ===
+# We'll create a dictionary for each employee.
+# The keys (like 'Age', 'DailyRate') MUST exactly match the original column names.
+
+# Employee A: Likely to stay
+employee_A_data = {
+    'Age': 35, 'DailyRate': 1200, 'DistanceFromHome': 2, 'Education': 4,
+    'EnvironmentSatisfaction': 4, 'HourlyRate': 85, 'JobInvolvement': 3,
+    'JobLevel': 3, 'JobSatisfaction': 4, 'MonthlyIncome': 8500,
+    'MonthlyRate': 20000, 'NumCompaniesWorked': 1, 'PercentSalaryHike': 15,
+    'PerformanceRating': 3, 'RelationshipSatisfaction': 4, 'StockOptionLevel': 1,
+    'TotalWorkingYears': 15, 'TrainingTimesLastYear': 3, 'WorkLifeBalance': 3,
+    'YearsAtCompany': 14, 'YearsInCurrentRole': 9, 'YearsSinceLastPromotion': 3,
+    'YearsWithCurrManager': 8,
+    'BusinessTravel': 'Travel_Rarely', 'Department': 'Research & Development',
+    'EducationField': 'Life Sciences', 'Gender': 'Female',
+    'JobRole': 'Research Director', 'MaritalStatus': 'Married', 'OverTime': 'No'
+}
+
+# Employee B: At risk of leaving
+employee_B_data = {
+    'Age': 24, 'DailyRate': 450, 'DistanceFromHome': 18, 'Education': 2,
+    'EnvironmentSatisfaction': 1, 'HourlyRate': 60, 'JobInvolvement': 2,
+    'JobLevel': 1, 'JobSatisfaction': 1, 'MonthlyIncome': 2800,
+    'MonthlyRate': 15000, 'NumCompaniesWorked': 3, 'PercentSalaryHike': 11,
+    'PerformanceRating': 3, 'RelationshipSatisfaction': 2, 'StockOptionLevel': 0,
+    'TotalWorkingYears': 3, 'TrainingTimesLastYear': 2, 'WorkLifeBalance': 1,
+    'YearsAtCompany': 2, 'YearsInCurrentRole': 1, 'YearsSinceLastPromotion': 0,
+    'YearsWithCurrManager': 1,
+    'BusinessTravel': 'Travel_Frequently', 'Department': 'Sales',
+    'EducationField': 'Marketing', 'Gender': 'Male',
+    'JobRole': 'Sales Representative', 'MaritalStatus': 'Single', 'OverTime': 'Yes'
+}
+
+# Convert our dictionaries into pandas DataFrames.
+new_employee_A = pd.DataFrame([employee_A_data])
+new_employee_B = pd.DataFrame([employee_B_data])
+
+print("--- New Employee Case Files Created ---")
+
+# === Step 2: Prepare the New Data EXACTLY Like the Training Data ===
+# This is the most crucial step! We must repeat the same transformations.
+
+def prepare_new_data(df_new, df_original_for_columns):
+    """A function to prepare new data for our model."""
+    
+    # Perform one-hot encoding for categorical variables.
+    df_prepared = pd.get_dummies(df_new, columns=['BusinessTravel', 'Department', 'EducationField', 'Gender', 'JobRole', 'MaritalStatus', 'OverTime'], drop_first=True)
+    
+    # Get the columns from the original training data (X) to ensure an exact match.
+    original_cols = df_original_for_columns.columns
+    
+    # Reindex the new data to match the training data columns.
+    # This adds any missing columns (and fills them with 0) and aligns the order.
+    df_prepared = df_prepared.reindex(columns=original_cols, fill_value=0)
+    
+    return df_prepared
+
+# Prepare both new employee files. We use 'X' (our original feature set before splitting) to get the correct column structure.
+employee_A_prepared = prepare_new_data(new_employee_A, X)
+employee_B_prepared = prepare_new_data(new_employee_B, X)
+
+# === Step 3: Use the SAME Scaler to Transform the New Data ===
+# We do NOT use .fit_transform() here. We only .transform().
+# This applies the scaling rules our model learned from the original training data.
+employee_A_scaled = scaler.transform(employee_A_prepared)
+employee_B_scaled = scaler.transform(employee_B_prepared)
+
+print("--- New Data Prepared and Scaled for Prediction ---")
+
+# === Step 4: Ask the Crystal Ball for its Prediction ===
+# .predict() gives a direct 0 (Stay) or 1 (Leave) answer.
+prediction_A = model.predict(employee_A_scaled)
+prediction_B = model.predict(employee_B_scaled)
+
+# .predict_proba() gives the probability for each outcome [Prob of Staying, Prob of Leaving].
+# This is much more useful!
+probability_A = model.predict_proba(employee_A_scaled)
+probability_B = model.predict_proba(employee_B_scaled)
+# === Step 5: Report the Findings (Upgraded with Business Logic) ===
+
+def get_risk_level(probability_of_leaving):
+    """Assigns a risk level based on a custom business threshold."""
+    prob_percent = probability_of_leaving * 100
+    if prob_percent > 30:
+        return "HIGH RISK"
+    elif 15 <= prob_percent <= 30:
+        return "MEDIUM RISK"
+    else:
+        return "LOW RISK"
+
+print("\n--- CRYSTAL BALL PREDICTION REPORT (Business Edition) ---")
+
+# --- Report for Employee A ---
+prob_A_leave = probability_A[0][1]
+risk_A = get_risk_level(prob_A_leave)
+
+print("\n--- Analysis for Employee A ---")
+print(f"Risk Level: {risk_A}")
+print(f"Confidence Score: There is a {prob_A_leave*100:.2f}% calculated probability that this employee will leave.")
+print("Recommendation: This employee appears safe. Standard engagement is sufficient.")
+
+
+# --- Report for Employee B ---
+prob_B_leave = probability_B[0][1]
+risk_B = get_risk_level(prob_B_leave)
+
+print("\n--- Analysis for Employee B ---")
+print(f"Risk Level: {risk_B}")
+print(f"Confidence Score: There is a {prob_B_leave*100:.2f}% calculated probability that this employee will leave.")
+print("Recommendation: URGENT! This employee is a high flight risk. HR should proactively engage with them to address potential issues (e.g., satisfaction, workload, compensation) immediately.")
+
+
+What Just Happened?
+You should see a very clear result.
+
+For Employee A, the model will likely predict 0 (Stay) and show a very low probability of leaving (e.g., 5-10%). This is because their profile (high satisfaction, good income, long tenure) matches the patterns of employees who stayed in our historical data.
+
+For Employee B, the model will likely predict 1 (Leave) and show a high probability of leaving (e.g., 60-80%). Their profile (low satisfaction, single, overtime, sales role) matches the patterns of employees who have left in the past.
+
+You have successfully used your predictive model to assess risk for new, unseen data. This is the ultimate goal of a data science project like this!
+
+Let's complete that final section now, creating the definitive guide for reporting your HR Attrition project results using Power BI.
+
+Section 6: Presenting to the Jury (BI & Reporting) 📊
+Our case is solved. Our detective work and statistical analysis are done. Now, we must prepare our findings in a clear and convincing way for the CEO. The final step in a data project is always to communicate your results effectively. We will export our clean data to be used in a Business Intelligence (BI) tool like Power BI to create an interactive dashboard.
+
+
+Step 1: Exporting the Final Data File
+First, we need to save our clean, feature-rich df DataFrame to a new CSV file. This file will be the single source of truth for our dashboard.
+
+Action: Make sure you have run this final code block in your 2_Analysis_and_Prediction.ipynb notebook.
+
+# What are we doing? Saving our final, clean DataFrame to a new CSV file.
+output_path = 'data_for_dashboard.csv'
+df.to_csv(output_path, index=False)
+
+print("\n--- Project Complete ---")
+print("Successfully exported the final analysis data to:", output_path)
+print("You can now find this file in your D:\\HR_Attrition_Project folder.")
+print("Use this file to build your dashboard in Power BI or your preferred BI tool.")
+
+Step 2: Closing the Python "Kitchen"
+You can now safely close Anaconda, the command prompt, and your Jupyter Notebooks. The Python notebooks were the "kitchen" where we prepared the meal; the data_for_dashboard.csv file is the final, perfectly cooked meal itself. We are now heading to the "dining room" (Power BI) to present it, so we don't need the kitchen anymore.
+
+
+Masterclass: The Power BI Dashboard (The Final Presentation)
+Part A: The New Mission: Briefing the CEO 📈
+Our new mission is to take our data_for_dashboard.csv file and build a beautiful, interactive dashboard. The goal is to present our findings so clearly that the CEO can understand the entire attrition situation in 5 minutes and even explore the data herself by clicking on different filters.
+
+Part B: Setting Up the Presentation Room
+First, you need to install the free Power BI Desktop application.
+
+
+Download: Go to the official Microsoft Power BI Desktop download page and install it like any other program.
+
+Launch: Open Power BI Desktop. You will see three main areas:
+
+
+The Data Pane (Right): Where your list of data columns will appear.
+
+
+The Visualizations Pane (Middle-Right): Your toolkit of charts (bar charts, pie charts, etc.).
+
+
+The Canvas (Center): The blank board where you will build your dashboard.
+
+Part C: Importing the Evidence
+Let's load our final CSV file into Power BI.
+
+On the main "Home" ribbon, click the Get Data button.
+
+Select Text/CSV from the list and click Connect.
+
+Navigate to your D:\HR_Attrition_Project folder and select data_for_dashboard.csv.
+
+A preview window will appear. It should look correct. Simply click the Load button.
+
+You will now see all your column names (like Department, MonthlyIncome, Attrition, etc.) in the Data Pane on the right. Our evidence is loaded!
+
+Part D: Building the Story (Creating the Dashboard Visuals)
+We will now create interactive charts to answer the CEO's questions.
+
+Visual #1: The Big Numbers - Key Metrics (Cards)
+
+Click on an empty space on your canvas.
+
+In the Visualizations Pane, click the Card visual (looks like a rectangle with "123").
+
+Drag EmployeeNumber from the Data Pane into the "Fields" area of the card. Click the little down-arrow next to it and select Count (Distinct) to show the total number of employees.
+
+Create a second Card. Drag Attrition_numeric into its Fields area. Click the down-arrow and select Average. Go to the "Format your visual" tab (paintbrush icon), find "Callout value," and change "Display units" to None and "Value decimal places" to 3. This will show the attrition rate (e.g., 0.161).
+
+Create a third Card for Average Monthly Income. Drag MonthlyIncome into the Fields area (it will default to Sum). Click the down-arrow and select Average.
+
+Visual #2: Solving Mystery #1 - The Leaky Departments (Bar Chart)
+
+Click on an empty space on the canvas.
+
+In the Visualizations Pane, click the Stacked column chart icon.
+
+With the new blank chart selected, drag these fields:
+
+Drag Department into the X-axis field.
+
+Drag EmployeeNumber into the Y-axis field (and ensure it's set to "Count").
+
+Drag Attrition into the Legend field.
+
+This chart now clearly shows which departments have the most employees leaving.
+
+Visual #3: Solving Mystery #3 - The Burnout Factor (Donut Chart)
+
+Click on an empty space.
+
+In the Visualizations Pane, click the Donut chart icon.
+
+Drag these fields:
+
+Drag JobSatisfaction_label into the Legend field.
+
+Drag Attrition_numeric into the Values field (ensure it's set to "Sum"). This will show the total number of leavers for each satisfaction level.
+
+Part E: Making It Professional and Interactive
+A dashboard's power comes from its interactivity. Let's add a filter.
+
+Click on an empty space on the canvas.
+
+In the Visualizations Pane, click the Slicer icon.
+
+Drag JobRole from the Data Pane into the Slicer's "Field" area.
+
+Now, when you click on a job role in this slicer (e.g., "Sales Representative"), all the other charts on your dashboard will instantly update to show data for only that role. This is the magic of an interactive dashboard!
+
+
+Final Touches
+
+
+Titles: Click on any visual, go to the "Format your visual" tab (paintbrush icon), and give it a clear, descriptive title.
+
+
+Colors: Use the "View" ribbon at the top to change the color theme to make your dashboard look polished and professional.
+
+You have now successfully completed the entire project, from raw data to a finished, interactive dashboard ready for the CEO. Congratulations!
+
+
+
+

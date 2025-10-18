@@ -1,68 +1,41 @@
 # HR Analytics & Employee Attrition Prediction
 
 ## Overview
-[cite_start]This project analyzes the IBM HR Analytics dataset to uncover the root causes of employee attrition and builds a predictive machine learning model to identify employees at risk of leaving[cite: 1685, 1692]. [cite_start]The goal is to provide actionable insights for HR to reduce turnover and a tool for proactive intervention[cite: 1700].
-
-## Business Problems / Mission Goals
-[cite_start]The analysis aims to solve five critical mysteries for the business[cite: 1695]:
-1.  [cite_start]**The Leaky Departments:** Identify the overall attrition rate and the departments with the highest turnover[cite: 1696].
-2.  [cite_start]**The Money Question:** Investigate the link between income, salary hike, and attrition[cite: 1697].
-3.  [cite_start]**The Burnout Factor:** Determine if low job satisfaction or poor work-life balance drives employees to leave[cite: 1698].
-4.  [cite_start]**The Loyalty Puzzle:** Uncover whether the company is losing long-term employees or newer hires[cite: 1699].
-5.  [cite_start]**The Crystal Ball (Prediction):** Build a machine learning model to predict the likelihood of an employee leaving[cite: 1700].
+This project analyzes the IBM HR Analytics dataset to uncover the root causes of employee attrition and builds a predictive machine learning model to identify employees at high risk of leaving. The analysis aims to provide actionable insights for the HR department to reduce turnover and retain valuable talent.
 
 ## Dataset
-[cite_start]The project uses the "IBM HR Analytics Employee Attrition & Performance" dataset obtained from Kaggle[cite: 1702, 1703]. [cite_start]The single CSV file (`WA_Fn-UseC_-HR-Employee-Attrition.csv`) was used for analysis[cite: 1704].
+The project uses the "IBM HR Analytics Employee Attrition & Performance" dataset from Kaggle. For a more realistic scenario, the single CSV was split into three simulated data sources: general employee data, satisfaction survey data, and manager performance data.
 
 ## Methodology
-1.  **ETL Process:**
-    * [cite_start]An automated Python script using Pandas and SQLAlchemy was developed to read the source CSV and load it into a structured SQLite database (`hr_analytics.db`)[cite: 1725, 1735, 1741, 1746].
-    * [cite_start]Logging was implemented to track the ingestion process[cite: 1730, 1732].
-2.  **Data Loading & Preparation (Python):**
-    * [cite_start]Connected to the SQLite database and loaded the `hr_data` table into a Pandas DataFrame[cite: 1761, 1764].
-    * [cite_start]Performed initial checks using `.head()` and `.info()`[cite: 1766, 1767].
-    * **Feature Engineering:** Created new columns for easier analysis:
-        * [cite_start]`Attrition_numeric` (Yes=1, No=0)[cite: 1772].
-        * [cite_start]`AgeGroup` (categorizing age into bins)[cite: 1774].
-        * [cite_start]`JobSatisfaction_label` (mapping numeric score to text)[cite: 1776].
-        * [cite_start]`WorkLifeBalance_label` (mapping numeric score to text)[cite: 1802].
-    * [cite_start]Checked for missing values (none found in this dataset)[cite: 1777].
-3.  **Exploratory Data Analysis (EDA):**
-    * [cite_start]Calculated the overall attrition rate[cite: 1790].
-    * [cite_start]Visualized attrition counts by `Department` using Seaborn countplot[cite: 1793].
-    * [cite_start]Compared `MonthlyIncome` and `PercentSalaryHike` distributions between attrited and non-attrited employees using box plots[cite: 1797].
-    * [cite_start]Analyzed the impact of `JobSatisfaction` and `WorkLifeBalance` on attrition using countplots[cite: 1801, 1802].
-    * [cite_start]Examined the distribution of `YearsAtCompany` for employees who left using a histogram[cite: 1806].
+1.  **ETL Process:** An automated Python script using SQLAlchemy and Pandas was created to extract data from the simulated CSV files and load them into a central SQLite database (`hr_analytics.db`). Logging was implemented for monitoring.
+2.  **SQL Aggregation:** Connected to the SQLite database and used SQL `JOIN` statements to merge the three tables (`employee_general_data`, `employee_survey_data`, `manager_survey_data`) into a single master DataFrame for analysis.
+3.  **Exploratory Data Analysis (EDA) & Feature Engineering:**
+    * Calculated the overall attrition rate.
+    * Visualized attrition patterns across departments, income levels, salary hikes, job satisfaction, work-life balance, and employee tenure using Seaborn and Matplotlib.
+    * Engineered new features like `Attrition_numeric`, `AgeGroup`, and mapped numerical satisfaction scores to labels (e.g., 'Low', 'High') for clearer analysis.
 4.  **Predictive Modeling (Logistic Regression):**
-    * [cite_start]Prepared data for modeling by converting categorical features to numerical using `pd.get_dummies`[cite: 1821].
-    * [cite_start]Dropped non-predictive or redundant columns[cite: 1823].
-    * [cite_start]Separated features (X) and target variable (y = `Attrition_numeric`)[cite: 1824, 1825].
-    * [cite_start]Split data into 80% training and 20% testing sets using `train_test_split`[cite: 1828].
-    * [cite_start]Scaled numerical features using `StandardScaler`[cite: 1829].
-    * [cite_start]Trained a `LogisticRegression` model on the scaled training data[cite: 1830].
-    * [cite_start]Made predictions on the scaled test data[cite: 1831].
-    * [cite_start]Evaluated model performance using Accuracy, Confusion Matrix, and Classification Report[cite: 1832, 1833].
-5.  **Prediction on New Data:**
-    * [cite_start]Created hypothetical new employee profiles[cite: 1840, 1842].
-    * [cite_start]Prepared and scaled the new data using the same steps as the training data[cite: 1846, 1850, 1854].
-    * [cite_start]Used the trained model to predict the probability of leaving and assigned a risk level[cite: 1855, 1856].
+    * Prepared data for modeling by converting categorical features into numerical format using one-hot encoding (`pd.get_dummies`).
+    * Split the data into training (80%) and testing (20%) sets using `train_test_split`.
+    * Scaled numerical features using `StandardScaler`.
+    * Trained a Logistic Regression model using Scikit-learn to predict `Attrition_numeric`.
+    * Evaluated model performance using Accuracy, Confusion Matrix, and Classification Report (Precision, Recall, F1-Score).
+5.  **Prediction on New Data:** Demonstrated how to use the trained model and scaler to predict the attrition risk (including probability) for hypothetical new employee profiles.
 
-## Key Findings
-* [cite_start]The overall attrition rate is approximately 16.12%[cite: 1793]. [cite_start]R&D department has the highest count of employees leaving[cite: 1793].
-* [cite_start]Employees who leave tend to have lower median monthly incomes[cite: 1798]. [cite_start]Salary hike percentage showed no significant difference[cite: 1798].
-* [cite_start]Lower Job Satisfaction and Work-Life Balance are strongly correlated with higher attrition rates[cite: 1801, 1802].
-* [cite_start]A significant number of employees leave within the first 0-2 years at the company[cite: 1806].
-* [cite_start]The Logistic Regression model achieved ~88% accuracy but struggled with recalling employees who actually left (low recall for class 1)[cite: 1832, 1833]. [cite_start]Model interpretation (coefficients) identified Overtime as a key predictor[cite: 17].
-* [cite_start]The model successfully predicted risk levels for new hypothetical employees[cite: 1857, 1858].
+## Key Questions Answered & Insights
+* **Overall Attrition Rate:** What percentage of employees are leaving? (Calculated rate)
+* **Leaky Departments:** Which departments face the highest attrition? (R&D had the highest count)
+* **Compensation Impact:** Do lower income or smaller salary hikes correlate with leaving? (Leavers tend to have lower median income; salary hike showed less difference)
+* **Burnout Factors:** Are low job satisfaction or poor work-life balance major drivers? (Yes, employees with 'Low' satisfaction or 'Bad' work-life balance leave more often)
+* **Loyalty Puzzle:** Are new hires or long-term employees leaving? (Significant attrition occurs within the first 0-2 years)
+* **Prediction:** Can we predict who is likely to leave? (Yes, the Logistic Regression model achieved ~88% accuracy, identifying key risk factors)
 
 ## Technologies Used
-* [cite_start]Python [cite: 1729, 1759]
-* [cite_start]Pandas [cite: 1729, 1759]
-* [cite_start]NumPy [cite: 1759]
-* [cite_start]SQLAlchemy [cite: 1729]
-* [cite_start]SQLite [cite: 1735, 1761]
-* [cite_start]Matplotlib [cite: 1759]
-* [cite_start]Seaborn [cite: 1759, 1760]
-* [cite_start]Scikit-learn (LogisticRegression, train_test_split, StandardScaler, accuracy_score, confusion_matrix, classification_report) [cite: 1813, 1814, 1815, 1816, 1829, 1830, 1832]
-* [cite_start]Jupyter Notebook [cite: 1705]
-* [cite_start]Power BI (Planned for final dashboarding) [cite: 1862]
+* Python
+* Pandas, NumPy
+* SQLAlchemy, SQLite
+* Matplotlib, Seaborn
+* Scikit-learn (LogisticRegression, train_test_split, StandardScaler, metrics)
+* Jupyter Notebook / Google Colab
+
+## Reporting
+The final cleaned data (`data_for_dashboard.csv`) was exported for visualization in Power BI, enabling the creation of an interactive dashboard for managers.
